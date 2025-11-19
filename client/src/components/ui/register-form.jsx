@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, GalleryVerticalEnd, UserPlus } from "lucide-react";
+// 1. Added the 'cn' utility import for consistency
+import { cn } from "@/lib/utils"; 
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 
-export default function RegisterForm({onSubmit, loading = false }) {
+// 2. Updated props to include 'className' and '...props' for structural consistency
+export default function RegisterForm({ className, onSubmit, loading = false, ...props }) {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,18 +23,20 @@ export default function RegisterForm({onSubmit, loading = false }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-md">
+    // 3. Used the 'cn' utility and 'className' prop for consistency
+   <div className={cn("flex flex-col gap-6 w-full max-w-md", className)} {...props}>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="flex flex-col gap-6">
+        <div className="text-center space-y-2">
           <div className="flex justify-center items-center gap-2">
             <GalleryVerticalEnd className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-bold">
               Code<span className="text-blue-600">Crackr</span>
             </h1>
           </div>
-          <h2 className="text-xl font-bold">Create your account</h2>
+          {/* 🚨 FIX: Changed heading class from 'text-xl font-bold' to 'text-lg font-semibold' */}
+          <h2 className="text-lg font-semibold">Create your account</h2>
         </div>
-        
+
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -41,10 +46,10 @@ export default function RegisterForm({onSubmit, loading = false }) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email" 
+            autoComplete="email"
           />
         </div>
- 
+
         <div className="grid gap-2">
           <Label htmlFor="username">Username</Label>
           <Input
@@ -57,7 +62,7 @@ export default function RegisterForm({onSubmit, loading = false }) {
             autoComplete="username"
           />
         </div>
- 
+
         <div className="grid gap-2 relative">
           <Label htmlFor="password">Password</Label>
           <Input
@@ -79,8 +84,9 @@ export default function RegisterForm({onSubmit, loading = false }) {
             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
         </div>
- 
-        <Button type="submit" className="w-full gap-2 cursor-pointer" disabled={loading}>
+
+        {/* Removed 'cursor-pointer' from Button for consistency */}
+        <Button type="submit" className="w-full gap-2" disabled={loading}>
           <UserPlus className="w-4 h-4" />
           {loading ? "Registering..." : "Register"}
         </Button>

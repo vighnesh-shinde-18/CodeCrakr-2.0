@@ -3,17 +3,17 @@ import User from '../models/User.Model.js'
 import ApiError from '../utils/ApiError.js'
 import asyncHandler from '../utils/asyncHandler.js'
 
-const verifyJwt = asyncHandler(async (req, res) => {
+const verifyJwt = asyncHandler(async (req, _,next) => {
     try {
-        const accessToken = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer", "")
-
-        if (accessToken) {
+        const AccessToken = req.cookies?.AccessToken || req.header("Authorization")?.replace("Bearer", "")
+    
+        if (!AccessToken) { 
             throw new ApiError(401, "Unauthorized Request");
-        }
+        }  
+        
+        const decodedToken =  jwt.verify(AccessToken,process.env.ACCESS_TOKEN_SECRET)
 
-        const decodedToken =  jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET)
-
-        const user = await User.findById(decodedToken?._id).select("-password")
+        const user = await User.findById(decodedToken?.id).select("-password")
 
         if(!user){
             throw new ApiError(404,"Invalid Access Token")

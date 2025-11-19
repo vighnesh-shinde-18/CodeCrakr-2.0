@@ -24,7 +24,7 @@ function Hero() {
   }
 
   return (
-    <section className="min-h-screen flex items-center justify-center px-4 py-12 transition-colors duration-300">
+    <section className="min-h-screen flex items-center justify-center mx-40 px-4 py-12 transition-colors duration-300">
       <Card className="w-full max-w-6xl border rounded-3xl shadow-2xl bg-white dark:bg-zinc-900 dark:border-zinc-800 transition-colors duration-300">
         <CardContent className="p-6 sm:p-10 md:p-14 space-y-10">
           <div className="text-center space-y-4">

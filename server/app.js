@@ -18,6 +18,9 @@ app.use(express.urlencoded({extended:true, limit:'1mb'}))
 app.use(cookieParser())
 
 import AuthRoutes from './routes/Auth.Routes.js'
+import ProblemRoutes from './routes/Problem.Routes.js'
+import getDashboardStats from './controllers/Stats.Controllers.js';
+import verifyJwt from './middlewares/Auth.Middleware.js';
 
 app.get("/test",(req,res)=>{
     res.json({
@@ -25,6 +28,8 @@ app.get("/test",(req,res)=>{
     })
 })
 app.use("/api/v1/auth",AuthRoutes)
+app.use("/api/v1/problem",ProblemRoutes)
+app.use("/api/v1/stats",verifyJwt,getDashboardStats)
 
 export default app;
 

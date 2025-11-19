@@ -1,5 +1,4 @@
-import LoginForm from "../components/ui/login-form.jsx"
-import asyncHandler from "../../../server/utils/asyncHandler.js";
+import LoginForm from "../components/ui/login-form.jsx" 
 import authService from "../api/AuthServices.jsx";
 import { toast } from 'sonner'
 import { useState } from 'react'
@@ -10,7 +9,7 @@ function LogIn() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate()
 
-    const loginUser = asyncHandler(async function ({ email, password, username }) {
+    const loginUser = async function ({ email, password, username }) {
 
         const toastId = toast.loading("Logining  User...");
         setIsLoading(true);
@@ -18,8 +17,13 @@ function LogIn() {
         try {
 
             const infoObj = { email, password }
-             await authService.login(infoObj)
+            const user =  await authService.login(infoObj)
+         
+            localStorage.setItem("email",user.email)
+            localStorage.setItem("username",user.username)
 
+            console.log(user.email," ",user.username)
+            
             toast.success("Login Successful! Redirect To Dashboard...", { id: toastId });
             navigate("/dashboard")
         } catch (error) {
@@ -31,13 +35,12 @@ function LogIn() {
             toast.error(userErrorMessage, { id: toastId });
 
         } finally {
-            // Remove loading toast and stop spinner in case of success or failure
-            setIsLoading(false);
+           setIsLoading(false);
 
         }
-    })
+    }
     return (
-        <section className="min-h-screen flex items-center justify-center px-4 py-10 bg-background">
+        <section className="w-full flex flex-row justify-center pt-32">
             <LoginForm onSubmit={loginUser} loading={isLoading} />
         </section>
     )

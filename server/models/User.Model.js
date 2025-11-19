@@ -4,13 +4,19 @@ import bcrypt from 'bcrypt'
 
 const userSchema = new mongoose.Schema({
     username: {
-        type: String, required: true, unique: true, trim: true
+        type: String, required: true, unique: true, trim: true 
     },
     email: {
-        type: String, required: true, trim: true, unique: true
+        type: String, required: true, trim: true, unique: true,  index:true 
     },
     password: {
-        type:String, required: [true, "Password is Correct"], select:false
+        type:String, required: [true, "Password is Required"], select:false
+    },
+    isAdmin:{
+        type:Boolean, default:false
+    },
+    resetPasswordOTP:{
+        type:String, default:null
     }
 }, { timestamps: true })
 
@@ -20,7 +26,7 @@ userSchema.pre("save", async function(next){
     next()
 })
 
-userSchema.methods.isPaaswordCorrect = async function(password){
+userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password, this.password)
 }
 

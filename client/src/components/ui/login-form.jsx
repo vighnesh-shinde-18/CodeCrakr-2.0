@@ -59,12 +59,12 @@ export default function LoginForm({ onSubmit, loading = false }) {
 
             <span
               className="text-sm mt-1 text-right text-blue-600 underline cursor-pointer hover:text-blue-800"
-            //   onClick={() => navigate("/forgot-password")}
+              onClick={() => navigate("/forgot-password")}
             >
               Forgot Password?
             </span>
           </div>
-          <Button type="submit" className="w-full gap-2" disabled={loading}>
+          <Button type="submit" className="w-full gap-2 cursor-pointer" disabled={loading}>
             <LogIn className="w-4 h-4" />
             {loading ? "Signing in..." : "Sign In"}
           </Button>

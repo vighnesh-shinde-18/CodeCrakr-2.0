@@ -41,7 +41,7 @@ function Register() {
     })
 
     return (
-        <section className="min-h-screen flex items-center justify-center px-4 py-10 bg-background">
+        <section className="w-full flex flex-row justify-center pt-32">
             <RegisterForm onSubmit={registerUser} loading={isLoading} />
         </section>
     )
