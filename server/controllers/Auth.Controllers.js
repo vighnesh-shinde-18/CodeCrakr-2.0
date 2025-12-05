@@ -50,6 +50,10 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Email and Password are required")
     }
 
+     if (!email.includes('@')) {
+        throw new ApiError(400, "Invalid Email Id")
+    }
+
     const user = await User.findOne({
         email
     }).select('+password -resetPasswordOTP')

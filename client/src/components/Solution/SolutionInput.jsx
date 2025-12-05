@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, X, MessageCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import Editor from "@monaco-editor/react"; 
-import solutionService from "../../api/SolutionServices.jsx"; 
+import Editor from "@monaco-editor/react";
+import solutionService from "../../api/SolutionServices.jsx";
 import replyService from "../../api/ReplyServices.jsx"; // 👈 Import Reply Service
 
 function useMonacoTheme() {
@@ -29,23 +29,22 @@ function useMonacoTheme() {
 export default function SolutionInput({
   showEditor,
   selectedSolution,
-  isUploader, 
-  handleAcceptSolution, 
+  isUploader,
   fetchSolutions,
   problemId,
 }) {
   const theme = useMonacoTheme();
-  
+
   // LocalStorage Check
   const [currentUserEmail, setCurrentUserEmail] = useState(() => {
-     return typeof window !== "undefined" ? localStorage.getItem("email") || "" : "";
+    return typeof window !== "undefined" ? localStorage.getItem("email") || "" : "";
   });
 
   // Form State
   const [code, setCode] = useState("// Write your solution...");
   const [explanation, setExplanation] = useState("");
   const [language, setLanguage] = useState("javascript");
-  
+
   // Reply State
   const [replyText, setReplyText] = useState("");
   const [replies, setReplies] = useState([]);
@@ -72,29 +71,45 @@ export default function SolutionInput({
   // 🔹 FETCH REPLIES when a solution is selected
   useEffect(() => {
     const loadReplies = async () => {
-        // If we have a selected solution, fetch its replies
-        if (selectedSolution && (selectedSolution.id || selectedSolution._id)) {
-            try {
-                const solutionId = selectedSolution.id || selectedSolution._id;
-                const response = await replyService.fetchAllReplies(solutionId);
-                
-                // Assuming backend returns { data: [...] }
-                if(response && response.data) {
-                    setReplies(response.data);
-                } else {
-                    setReplies([]);
-                }
-            } catch (error) {
-                console.error("Failed to load replies:", error);
-                setReplies([]); 
-            }
-        } else {
+      // If we have a selected solution, fetch its replies
+      if (selectedSolution && (selectedSolution.id || selectedSolution._id)) {
+        try {
+          const solutionId = selectedSolution.id || selectedSolution._id;
+          const response = await replyService.fetchAllReplies(solutionId);
+
+          // Assuming backend returns { data: [...] }
+          if (response && response.data) {
+            setReplies(response.data);
+          } else {
             setReplies([]);
+          }
+        } catch (error) {
+          console.error("Failed to load replies:", error);
+          setReplies([]);
         }
+      } else {
+        setReplies([]);
+      }
     };
 
     loadReplies();
   }, [selectedSolution]);
+
+
+  const handleAcceptSolution = async (solutionIndex) => {
+    try {
+
+      await solutionService.toggleSolutionAccept(solutionIndex);
+      fetchSolutions()
+    } catch (err) {
+      console.error("Error fetching solutions:", err);
+      toast.error("Failed to load solutions");
+    } finally {
+      setLoadingSolutions(false);
+    }
+    const updatedSolutions = [...allSolutions];
+    setAllSolutions(updatedSolutions);
+  };
 
   // 🔹 SUBMIT NEW SOLUTION
   const handleSubmit = useCallback(async () => {
@@ -106,10 +121,10 @@ export default function SolutionInput({
     setIsSubmitting(true);
     try {
       await solutionService.SubmitSolution(problemId, { code, explanation, language });
-      
+
       toast.success("Solution submitted successfully!");
-      fetchSolutions(); 
-      
+      fetchSolutions();
+
       // Reset fields
       setCode("// Write your solution...");
       setExplanation("");
@@ -130,18 +145,18 @@ export default function SolutionInput({
     setIsSubmittingReply(true);
     try {
       const solutionId = selectedSolution.id || selectedSolution._id;
-      
+
       // Call Service
       const newReply = await replyService.SubmitReply(solutionId, { reply: replyText });
 
       // Update UI: Append new reply to list
       // Note: We check if newReply has 'replier' populated. 
       // If the backend returns just ID, we might need to manually add username for optimistic UI.
-      
+
       setReplies(prev => [newReply, ...prev]); // Add to top
       setReplyText("");
       toast.success("Reply posted.");
-      
+
     } catch (err) {
       console.error(err);
       toast.error("Failed to post reply.");
@@ -154,21 +169,21 @@ export default function SolutionInput({
   // 🔹 ACCEPT / UNACCEPT SOLUTION
   const handleToggleAccept = useCallback(async () => {
     try {
-        await solutionService.toggleSolutionAccept(selectedSolution.id || selectedSolution._id);
-        toast.success("Solution status updated.");
-        handleAcceptSolution(); 
+      await solutionService.toggleSolutionAccept(selectedSolution.id || selectedSolution._id);
+      toast.success("Solution status updated.");
+      handleAcceptSolution();
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
   }, [selectedSolution, handleAcceptSolution]);
 
   // 🔹 DELETE SOLUTION 
   const handleDeleteSolution = useCallback(async () => {
-    if(!window.confirm("Delete this solution?")) return;
+    if (!window.confirm("Delete this solution?")) return;
     try {
       await solutionService.deleteSolution(selectedSolution.id || selectedSolution._id);
       toast.success("Solution deleted.");
-      fetchSolutions(); 
+      fetchSolutions();
     } catch (err) {
       console.error(err);
     }
@@ -189,15 +204,15 @@ export default function SolutionInput({
             </span>
           )}
         </div>
-
+{console.log(selectedSolution)}
         <div className="border rounded-lg overflow-hidden h-[300px]">
-            <Editor
-                height="100%"
-                language={selectedSolution.language || "javascript"}
-                theme={theme}
-                value={selectedSolution.code}
-                options={{ readOnly: true, minimap: { enabled: false } }}
-            />
+          <Editor
+            height="100%"
+            language={selectedSolution.language || "javascript"}
+            theme={theme}
+            value={selectedSolution.code}
+            options={{ readOnly: true, minimap: { enabled: false } }}
+          />
         </div>
 
         <div className="p-4 rounded-md border bg-gray-50 dark:bg-zinc-800 text-sm">
@@ -207,71 +222,70 @@ export default function SolutionInput({
 
         {/* ACTIONS */}
         <div className="flex gap-3 mt-4">
-            {isUploader && (
-                <Button 
-                    onClick={handleToggleAccept} 
-                    className={`flex-1 gap-2 font-semibold text-white ${
-                        selectedSolution.accepted ? "bg-red-500 hover:bg-red-600" : "bg-green-600 hover:bg-green-700"
-                    }`}
-                >
-                    {selectedSolution.accepted ? (
-                        <><X className="w-4 h-4" /> Unaccept</>
-                    ) : (
-                        <><CheckCircle2 className="w-4 h-4" /> Mark as Accepted</>
-                    )}
-                </Button>
-            )}
+          {isUploader && (
+            <Button
+              onClick={handleToggleAccept}
+              className={`gap-2 font-semibold text-white ${selectedSolution.accepted ? "bg-red-500 hover:bg-red-600" : "bg-green-600 hover:bg-green-700"
+                }`}
+            >
+              {selectedSolution.accepted ? (
+                <><X className="w-4 h-4" /> Unaccept</>
+              ) : (
+                <><CheckCircle2 className="w-4 h-4" /> Mark as Accepted</>
+              )}
+            </Button>
+          )}
 
-             <Button onClick={handleDeleteSolution} variant="destructive" className="flex items-center gap-2">
-                <Trash2 className="w-4 h-4" /> Delete
-             </Button>
+          <Button onClick={handleDeleteSolution} variant="destructive" className="flex items-center gap-2">
+            <Trash2 className="w-4 h-4" /> Delete
+          </Button>
         </div>
 
         {/* REPLIES SECTION */}
         <div className="mt-6 border-t pt-4">
-           <div className="flex justify-between items-center mb-3">
-             <h4 className="text-sm text-muted-foreground font-medium flex items-center gap-2">
-               <MessageCircle className="w-4 h-4" /> Discussion ({replies.length})
-             </h4>
-           </div>
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="text-sm text-muted-foreground font-medium flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" /> Discussion ({replies.length})
+            </h4>
+          </div>
 
-           {/* Reply Input */}
-           <div className="flex flex-col gap-2 mb-4">
-             <textarea
-               rows="2"
-               className="w-full p-2 border rounded-md text-sm bg-background"
-               placeholder="Ask a question or provide feedback..."
-               value={replyText}
-               onChange={(e) => setReplyText(e.target.value)}
-             />
-             <Button 
-               size="sm" 
-               onClick={handlePostReply} 
-               disabled={isSubmittingReply}
-               className="self-end"
-             >
-               {isSubmittingReply ? "Posting..." : "Post Reply"}
-             </Button>
-           </div>
-          
-           {/* Replies List */}
-           <div className="space-y-3 max-h-60 overflow-y-auto">
-             {replies.length === 0 && <p className="text-xs text-gray-400">No replies yet. Be the first!</p>}
-             
-             {replies.map((r, i) => (
-                <div key={r.id || r._id || i} className="border p-3 rounded bg-gray-50 dark:bg-zinc-800 text-sm">
-                    <div className="flex justify-between mb-1">
-                        {/* Check if replier is populated object or just ID/string */}
-                        <span className="font-bold text-blue-600">
-                           {r.replier?.username || r.username || "User"}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                           {r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ""}
-                        </span>
-                    </div>
-                    <p>{r.reply}</p>
+          {/* Reply Input */}
+          <div className="flex flex-col gap-2 mb-4">
+            <textarea
+              rows="2"
+              className="w-full p-2 border rounded-md text-sm bg-background"
+              placeholder="Ask a question or provide feedback..."
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+            />
+            <Button
+              size="sm"
+              onClick={handlePostReply}
+              disabled={isSubmittingReply}
+              className="self-end"
+            >
+              {isSubmittingReply ? "Posting..." : "Post Reply"}
+            </Button>
+          </div>
+
+          {/* Replies List */}
+          <div className="space-y-3 max-h-60 overflow-y-auto">
+            {replies.length === 0 && <p className="text-xs text-gray-400">No replies yet. Be the first!</p>}
+
+            {replies.map((r, i) => (
+              <div key={r.id || r._id || i} className="border p-3 rounded bg-gray-50 dark:bg-zinc-800 text-sm">
+                <div className="flex justify-between mb-1">
+                  {/* Check if replier is populated object or just ID/string */}
+                  <span className="font-bold text-blue-600">
+                    {r.replier?.username || r.username || "User"}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ""}
+                  </span>
                 </div>
-             ))}
+                <p>{r.reply}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -24,7 +24,7 @@ function Register() {
           await authService.createAccount(infoObj)
            
             toast.success("Registration Successful! Redirect To Login...", { id: toastId });
-            useNavigate('/login')
+            navigate('/login')
         } catch (error) {
            
             const userErrorMessage = error.message || "An unknown error occurred.";

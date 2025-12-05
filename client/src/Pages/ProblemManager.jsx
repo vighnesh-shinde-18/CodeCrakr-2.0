@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+ ;
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import UploadTab from "../components/ProblemTabs/UploadTab.jsx";
@@ -17,10 +16,8 @@ const ProblemManager = () => {
                 <TabsList>
                     <TabsTrigger className="cursor-pointer"  value="upload">Upload Problem</TabsTrigger>
                     <TabsTrigger className="cursor-pointer" value="myproblems">My Problems</TabsTrigger>
-                </TabsList>
-                {/* Upload Tab */}
-                <UploadTab />
-                {/* My Problems Tab */}
+                </TabsList> 
+                <UploadTab /> 
                 <ProblemTab />
             </Tabs>
         </div>

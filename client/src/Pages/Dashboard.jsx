@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { SectionCards } from "@/components/card/SectionCard.jsx"; 
 import statsService from "../api/StatsServices.jsx"; 
-import LeaderboardComponent from "../components/leaderboard/Leaderboard.jsx";
+import Leaderboard  from "../components/leaderboard/Leaderboard.jsx";
 import { toast } from "sonner"; 
  
 const DEFAULT_DASHBOARD_DATA = {
@@ -85,7 +85,7 @@ export default function Dashboard() {
                         {isLoading ? (
                             <p className="text-center text-blue-500">Loading leaderboard...</p>
                         ) : (
-                            <LeaderboardComponent  
+                            <Leaderboard 
                                 // Pass initial podium data, user stats, and all metrics for filtering
                                 podiumData={initialPodiumData} 
                                 currentUserStats={currentUserStats} 

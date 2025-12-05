@@ -68,9 +68,7 @@ function UploadTab() {
                     placeholder="Enter problem title"
                     value={form.title}
                     onChange={(e) => handleChange("title", e.target.value)}
-                />
-
-                {/* Description */}
+                /> 
                 <Label>Description</Label>
                 <Textarea
                     placeholder="Describe the problem in detail"
@@ -106,7 +104,6 @@ function UploadTab() {
                 <Button type="button" className="mx-1 my-1" variant="outline" onClick={addTestCase}>
                     + Add Test Case
                 </Button>
-
                 <Button className="mx-2 my-1" onClick={(e) => handleSubmit(e)}>Submit Problem</Button>
             </div>
         </TabsContent>

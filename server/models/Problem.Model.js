@@ -6,8 +6,7 @@ const testCasesSchema = new mongoose.Schema({
 }, { _id: false })
 
 const reportSchema = new mongoose.Schema({
-    reporter: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    reportAt: { type: Date, default: Date.now }
+    reporter: {  },
 }, { _id: false })
 
 const problemSchema = new mongoose.Schema({
@@ -23,7 +22,7 @@ const problemSchema = new mongoose.Schema({
     },
     testCases: [testCasesSchema],
     uploader: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    reports: { type: [reportSchema], index: true }
+    reports: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true}]
 
 }, { timestamps: true })
 

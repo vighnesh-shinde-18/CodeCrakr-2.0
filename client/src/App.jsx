@@ -1,4 +1,3 @@
-
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import Hero from './Pages/Hero.jsx'
@@ -30,10 +29,10 @@ function App() {
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password' element={<ResetPassword />} />
         <Route path='/dashboard' element={<Layout><Dashboard /></Layout>} />
-        <Route path='/problem-manager' element={<Layout><ProblemManager /></Layout>} />
-        <Route path='/code-playground' element={<Layout><CodePlayGround /></Layout>} />
         <Route path='/problems' element={<Layout><ProblemList /></Layout>} />
+        <Route path='/problem-manager' element={<Layout><ProblemManager /></Layout>} />
         <Route path='/history' element={<Layout><History /></Layout>} />
+        <Route path='/code-playground' element={<Layout><CodePlayGround /></Layout>} />
         <Route path='/ai/:feature' element={<Layout><AIFeature /></Layout>} />
         <Route path="/solve-problem/:slug/:id" element={<Layout sidebarVisible={false}><ProblemSolving /></Layout>} />
       </Routes>

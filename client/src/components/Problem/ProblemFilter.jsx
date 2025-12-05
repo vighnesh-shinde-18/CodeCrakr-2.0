@@ -36,7 +36,7 @@ function ProblemFilters({
                 onChange={(e) => setAcceptedFilter(e.target.value)} 
                 className="dark:bg-zinc-800 dark:text-white px-3 py-2 border rounded-md text-sm"
             >
-                <option value="All">Accepted: All</option>
+                <option value="All">All</option>
                 <option value="Accepted">Accepted</option>
                 <option value="Not Accepted">Not Accepted</option>
             </select>
@@ -46,7 +46,7 @@ function ProblemFilters({
                 onChange={(e) => setRepliedFilter(e.target.value)} 
                 className="dark:bg-zinc-800 dark:text-white px-3 py-2 border rounded-md text-sm"
             >
-                <option value="All">Replied: All</option>
+                <option value="All">All</option>
                 <option value="Replied">Replied</option>
                 <option value="Not Replied">Not Replied</option>
             </select>

@@ -62,12 +62,7 @@ const getInteractionById = asyncHandler(async (req, res) => {
         throw new ApiError(statusCode, message)
     }
 });
-
-/**
- * @desc    Delete interaction by ID
- * @route   DELETE /api/interactions/:id
- * @access  Private
-*/
+ 
 const deleteInteractionById = asyncHandler(async (req, res) => {
     try {
 
@@ -93,12 +88,7 @@ const deleteInteractionById = asyncHandler(async (req, res) => {
     }
 }
 );
-
-/**
- * @desc    Clear all interactions for the user
- * @route   DELETE /api/interactions/clear
- * @access  Private
-*/
+ 
 const deleteAllInteractions = asyncHandler(async (req, res) => {
     try {
         await AiInteraction.deleteMany({ userId: req.user._id });

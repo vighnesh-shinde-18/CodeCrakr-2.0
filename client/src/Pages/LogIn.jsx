@@ -9,7 +9,7 @@ function LogIn() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate()
 
-    const loginUser = async function ({ email, password, username }) {
+    const loginUser = async function ({ email, password }) {
 
         const toastId = toast.loading("Logining  User...");
         setIsLoading(true);
@@ -21,9 +21,7 @@ function LogIn() {
          
             localStorage.setItem("email",user.email)
             localStorage.setItem("username",user.username)
-
-            console.log(user.email," ",user.username)
-            
+ 
             toast.success("Login Successful! Redirect To Dashboard...", { id: toastId });
             navigate("/dashboard")
         } catch (error) {

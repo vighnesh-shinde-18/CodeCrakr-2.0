@@ -1,58 +1,55 @@
 import { CheckCircle2, ThumbsUp, Flag, MessageSquare } from "lucide-react";
-import { useState, useCallback, memo, useEffect, useRef } from "react";
+import { useState, useCallback, memo, useEffect } from "react";
 import { toast } from "sonner";
 import solutionService from "../../api/SolutionServices.jsx";
 
 export default function SolutionReplies({
   allSolutions,
   onViewSolution,
-  selectedSolutionId,
-  setSelectedSolutionId,
+  selectedSolution,
+  setSelectedSolution,
+  fetchSolutions
 }) {
   if (!allSolutions.length)
     return <p className="text-muted-foreground">No solutions yet.</p>;
-
+ 
   return (
     <div className="space-y-4">
       {allSolutions.map((solution) => (
         <MemoizedSolutionCard
           key={solution.id}
           solution={solution}
-          isSelected={selectedSolutionId === solution.id}
+          isSelected={selectedSolution?.id === solution?.id}
           onSelect={() => {
-            setSelectedSolutionId(solution.id);
+            setSelectedSolution(solution);
             onViewSolution(solution);
           }}
+          fetchSolutions={fetchSolutions}
         />
       ))}
     </div>
   );
 }
 
-const SolutionCard = ({ solution, isSelected, onSelect }) => {
+const SolutionCard = ({ solution, isSelected, onSelect, fetchSolutions }) => {
+  // Initialize state directly from props to prevent hydration mismatch
   const [interactionData, setInteractionData] = useState({
-    likesCount: 0,
-    liked: false,
-    reportCount: 0,
-    reported: false,
+    likesCount: solution.likesCount || 0,
+    liked: solution.liked || false,
+    reportCount: solution.reportCount || 0,
+    reported: solution.reported || false,
   });
-
-  const [loading, setLoading] = useState({
-    like: false,
-    report: false,
-  });
-
-  // synchronous in–flight flags (fix double-click issue)
- 
+  
   const replyCount = solution.replyCount || 0;
 
-  // Sync local state when solution changes
+  // 1. SYNC: Update local state whenever the parent passes a new 'solution' prop
+  // This runs automatically after fetchSolutions() completes in the parent
   useEffect(() => {
     setInteractionData({
       likesCount: solution.likesCount || 0,
-      liked: solution.liked,
+      liked: solution.liked || false,
       reportCount: solution.reportCount || 0,
-      reported: solution.reported,
+      reported: solution.reported || false,
     });
   }, [solution]);
 
@@ -61,28 +58,31 @@ const SolutionCard = ({ solution, isSelected, onSelect }) => {
     async (e) => {
       e.stopPropagation();
 
-      // hard block double-tap while request in-flight
-       
+      // Optimistic UI: Calculate what the new state SHOULD be for the Toast
+      const willBeLiked = !interactionData.liked;
 
-      setLoading((curr) => ({ ...curr, like: true }));
-
-    
       try {
-        const data = await solutionService.toggleLike(solution.id);
-
-        // if backend returns canonical state, prefer that
-        
-      } catch (error) {
-        // rollback on failure
-        if (prevSnapshot) {
-          setInteractionData(prevSnapshot);
+        // 1. Call API
+        await solutionService.toggleLike(solution.id);
+        // 2. Show Toast immediately (better UX)
+        if (willBeLiked) {
+          toast.success("Solution Liked");
+        } else {
+          toast.info("Like removed");
         }
+        
+        // 3. Refresh Data
+        // This triggers the parent to re-render, sending new props, 
+        // which triggers the useEffect above.
+        await fetchSolutions(); 
+        
+        console.log("info ",interactionData)
+      } catch (error) {
         console.error("Like failed:", error);
         toast.error("Failed to like solution");
-      } finally {
-          }
+      }
     },
-    [solution.id]
+    [solution.id, interactionData.liked, fetchSolutions] // Added dependencies
   );
 
   // REPORT handler
@@ -90,62 +90,26 @@ const SolutionCard = ({ solution, isSelected, onSelect }) => {
     async (e) => {
       e.stopPropagation();
 
-      if (reportInFlightRef.current) return;
-      reportInFlightRef.current = true;
-
-      setLoading((curr) => ({ ...curr, report: true }));
-
-      let prevSnapshot;
-      setInteractionData((prev) => {
-        prevSnapshot = prev;
-        const willReport = !prev.reported;
-        return {
-          ...prev,
-          reported: willReport,
-          reportCount: Math.max(
-            0,
-            prev.reportCount + (willReport ? 1 : -1)
-          ),
-        };
-      });
-
       try {
         const data = await solutionService.toggleReport(solution.id);
-
-        if (data) {
-          setInteractionData((curr) => ({
-            ...curr,
-            reported:
-              typeof data.reported === "boolean"
-                ? data.reported
-                : curr.reported,
-            reportCount:
-              typeof data.reportCount === "number"
-                ? data.reportCount
-                : curr.reportCount,
-          }));
-
-          if (data.reported) {
-            toast.success("Solution reported.");
-          } else {
-            toast.info("Report removed.");
-          }
+        
+        // Use the response from backend for the toast if possible, 
+        // or check the boolean returned by your API
+        if (data.reported) { // Assuming your API returns { reported: true/false }
+          toast.success("Solution reported.");
+        } else {
+          toast.info("Report removed.");
         }
+ 
+        await fetchSolutions();
+
       } catch (error) {
-        if (prevSnapshot) {
-          setInteractionData(prevSnapshot);
-        }
         console.error("Report failed:", error);
         toast.error("Failed to report solution");
-      } finally {
-        reportInFlightRef.current = false;
-        setLoading((curr) => ({ ...curr, report: false }));
       }
     },
-    [solution.id]
+    [solution.id, fetchSolutions]
   );
-
-  const { liked, likesCount, reported, reportCount } = interactionData;
 
   return (
     <div
@@ -174,30 +138,27 @@ const SolutionCard = ({ solution, isSelected, onSelect }) => {
       </p>
 
       <div className="flex items-center mt-3 gap-4 text-sm text-gray-500 dark:text-gray-300">
-        {/* LIKE BUTTON */}
         <button
           onClick={handleToggleLike}
-          disabled={loading.like}
           className={`flex items-center gap-1 transition-colors ${
-            liked ? "text-blue-600 font-semibold" : "hover:text-blue-500"
-          } ${loading.like ? "opacity-60 cursor-wait" : ""}`}
+            interactionData.liked ? "text-blue-600 font-semibold" : "hover:text-blue-500"
+          }`}
           title="Like this solution"
         >
-          <ThumbsUp className={`w-4 h-4 ${liked ? "fill-blue-600" : ""}`} />
-          <span>{likesCount}</span>
+          <ThumbsUp className={`w-4 h-4 ${interactionData.liked ? "fill-blue-600" : ""}`} />
+          <span>{interactionData.likesCount}</span>
         </button>
 
         {/* REPORT BUTTON */}
         <button
           onClick={handleToggleReport}
-          disabled={loading.report}
           className={`flex items-center gap-1 transition-colors ${
-            reported ? "text-red-600 font-semibold" : "hover:text-red-500"
-          } ${loading.report ? "opacity-60 cursor-wait" : ""}`}
+            interactionData.reported? "text-red-600 font-semibold" : "hover:text-red-500"
+          }`}
           title="Report this solution"
         >
-          <Flag className={`w-4 h-4 ${reported ? "fill-red-600" : ""}`} />
-          <span>{reportCount}</span>
+          <Flag className={`w-4 h-4 ${interactionData.reported ? "fill-red-600" : ""}`} />
+          <span>{interactionData.reportCount}</span>
         </button>
 
         {/* REPLY COUNT (read-only) */}

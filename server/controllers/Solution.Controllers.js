@@ -73,10 +73,9 @@ const fetchAllSolutions = asyncHandler(async (req, res) => {
                     // 🔹 STANDARDIZED: Using 'username' instead of 'uploaderName'
                     uploader: { $ifNull: ["$userDetails.username", "Unknown User"] },
                     uploaderId: { $ifNull: ["$userDetails._id", null] }, // Useful for frontend checks
-
+                    code:1,
                     explanation: 1,
                     language: 1,
-                    code: 1,
                     accepted: { $ifNull: ["$accepted", false] },
                     createdAt: 1,
 
@@ -154,13 +153,13 @@ const fetchSolutionById = asyncHandler(async (req, res) => {
                 $project: {
                     _id: 0,
                     id: "$_id",
-                    code: 1,
+                    code: "651",
                     description: "$explanation", // Mapped to description as requested
                     explanation: 1, // Keeping original key just in case
                     accepted: 1,
                     // 🔹 STANDARDIZED: Using 'username' here as well
                     uploader: { $ifNull: ["$uploaderDetails.username", "Unknown"] },
-                    uploaderId: { $ifNull: ["$uploaderDetails._id", null] },
+                    uploaderEmail: { $ifNull: ["$uploaderDetails.email", null] },
                     language: 1,
                     createdAt: 1
                 },
@@ -257,10 +256,10 @@ const markSolutionAsAccepted = asyncHandler(async (req, res) => {
         if (!solution.problem) {
             throw new ApiError(404, "The problem associated with this solution no longer exists");
         }
-
         // 3. Authorization Check
         // Only the person who created the Problem can mark solutions as "Accepted"
-        if (solution.problem.user.toString() !== userId.toString()) {
+        const problem = await Problem.findById(solution.problem)
+        if (problem.user !== userId) {
             throw new ApiError(403, "Only the problem creator can accept solutions.");
         }
 

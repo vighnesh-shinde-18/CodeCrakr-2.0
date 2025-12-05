@@ -196,15 +196,16 @@ const fecthProblemById = asyncHandler(async (req, res) => {
         const currentUserId = req.user?.id?.toString();
 
         const problem = await Problem.findById(problemId)
-            .populate("uploader", "username")
+            .populate("uploader", "username email")
             .lean();
-
+        console.log("problem ", problem)
         if (!problem) {
             throw new ApiError(404, "Problem Not Found");
         }
 
         // 🟢 FIX: Ensure 'reports' is always an array. 
         // If it's undefined (missing in DB), default to empty array [].
+
         const reportsList = problem.reports || [];
 
         // 🔹 Calculate Report Data using the safe 'reportsList'
@@ -212,9 +213,10 @@ const fecthProblemById = asyncHandler(async (req, res) => {
 
         // Check if current user exists in the reports array
         const isReported = currentUserId
-            ? reportsList.some((r) => r.reporter.toString() === currentUserId)
+            ? reportsList.some((r) => r.toString() === currentUserId.toString())
             : false;
 
+        console.log(isReported)
         // 🔹 Construct Response
         const responseObj = {
             id: problem._id,
@@ -223,12 +225,12 @@ const fecthProblemById = asyncHandler(async (req, res) => {
             topics: problem.topics,
             testCases: problem.testCases,
             username: problem.uploader?.username || "Unknown", // Safe check for uploader
+            email: problem.uploader?.email, // Safe check for uploader
             userId: problem.uploader?._id,
             createdAt: problem.createdAt,
             reportCount,
             isReported
         };
-
         return res.status(200).json({
             success: true,
             data: responseObj,
@@ -260,7 +262,7 @@ const toggleReportProblem = asyncHandler(async (req, res) => {
 
         // Check if user has already reported (Using 'reporter' from schema)
         const reportIndex = problem.reports.findIndex(
-            (r) => r.reporter.toString() === userId.toString()
+            (reportId) => reportId.toString() === userId.toString()
         );
 
         if (reportIndex !== -1) {
@@ -277,7 +279,7 @@ const toggleReportProblem = asyncHandler(async (req, res) => {
         }
 
         // Not reported yet -> Add report
-        problem.reports.push({ reporter: userId });
+        problem.reports.push(userId);
         await problem.save();
 
         return res.status(200).json({

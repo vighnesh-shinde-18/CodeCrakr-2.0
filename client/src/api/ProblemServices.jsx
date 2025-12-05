@@ -65,7 +65,7 @@ export class ProblemService {
     async fecthProblemDetails(id) {
         try {
             const response = await this.api.get(`/${id}`)
-            console.log(response.data)
+            console.log(response)
             return response.data.data;
         } catch (error) {
             this.handleError(error)
