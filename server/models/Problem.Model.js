@@ -4,10 +4,7 @@ const testCasesSchema = new mongoose.Schema({
     input: { type: String, required: true },
     output: { type: String, required: true }
 }, { _id: false })
-
-const reportSchema = new mongoose.Schema({
-    reporter: {  },
-}, { _id: false })
+ 
 
 const problemSchema = new mongoose.Schema({
     title: {

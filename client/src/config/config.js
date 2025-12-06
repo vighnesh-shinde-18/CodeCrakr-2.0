@@ -17,11 +17,10 @@ const LANGUAGES = [
     { value: "php-8", label: "PHP", monaco: "php" },
     { value: "ruby", label: "Ruby", monaco: "ruby" },
     { value: "swift", label: "Swift", monaco: "swift" },
-    { value: "rust-1.85", label: "Rust", monaco: "rust" },
-    { value: "sql", label: "SQL", monaco: "sql" },
+    { value: "rust-1.85", label: "Rust", monaco: "rust" }
 ];
 
-export {config, LANGUAGES};
+export { config, LANGUAGES };
 
 /*
 // Example of what your .env file might look like:
