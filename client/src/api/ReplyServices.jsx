@@ -32,7 +32,7 @@ export class ReplyService {
 
     async SubmitReply(id, reply) {
         try {
-            const response = await this.api.post(`/problem/${id}`, reply)
+            const response = await this.api.post(`/${id}`, reply)
             console.log(response.data)
             return response.data.data
         } catch (error) {
