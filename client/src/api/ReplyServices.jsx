@@ -1,5 +1,5 @@
 import { config } from "../config/config.js";
- 
+
 import axios from 'axios'
 
 export class ReplyService {
@@ -21,7 +21,7 @@ export class ReplyService {
         try {
             // CHANGED: .post() to .get()
             // Also added logic to handle undefined values to avoid "undefined" strings in URL
-        
+
             const response = await this.api.get(`/${id}`);
             return response.data;
         } catch (error) {
@@ -31,7 +31,7 @@ export class ReplyService {
 
 
     async SubmitReply(id, reply) {
-        try { 
+        try {
             const response = await this.api.post(`/problem/${id}`, reply)
             console.log(response.data)
             return response.data.data
@@ -39,8 +39,22 @@ export class ReplyService {
             this.handleError(error)
         }
     }
+    handleError(error) {
+        if (axios.isCancel(error)) {
+            throw error; // Let the component handle aborts silently
+        }
+        if (error.response && error.response.data) {
+            console.error("API Error:", error.response.data);
+            const serverMessage = error.response.data.message || "Request failed.";
+            throw new Error(serverMessage);
+        } else if (error.message) {
+            console.error("Network Error:", error.message);
+            throw new Error(error.message);
+        } else {
+            throw new Error("An unexpected error occurred.");
+        }
+    }
 
-    
 }
 
 const replyService = new ReplyService()
