@@ -1,5 +1,5 @@
 
-import ProblemTable  from "@/components/problem/ProblemTable.jsx";
+import ProblemTable  from "@/components/Problem/ProblemTable.jsx";
 
 function ProblemList () {
 
