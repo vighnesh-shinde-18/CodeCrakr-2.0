@@ -1,29 +1,23 @@
-import React, { useState } from "react"
-import { Eye, EyeOff, GalleryVerticalEnd, LogIn } from "lucide-react"
+import React, { useState } from "react";
+import { Eye, EyeOff, GalleryVerticalEnd, LogIn } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useNavigate } from "react-router-dom"
+export default function LoginForm({ onSubmit, loading = false }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-interface LoginFormProps {
-  onSubmit: (data: any) => void;
-  loading?: boolean;
-}
-
-export default function LoginForm({ onSubmit, loading = false }: LoginFormProps) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const navigate = useNavigate()
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit({ email, password })
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({ email, password });
+  };
 
   return (
-    // CHANGED: Added px-4 for mobile safety, mx-auto to center, and responsive width
+    // Responsive Container: px-4 ensures it doesn't touch edges on mobile
     <div className="flex flex-col gap-6 w-full max-w-sm sm:max-w-md px-4 sm:px-0 mx-auto">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex flex-col gap-6">
@@ -51,7 +45,7 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              // CHANGED: Taller input on desktop for better feel
+              // Taller inputs on desktop (h-11) for better UX
               className="h-10 md:h-11" 
             />
           </div>
@@ -68,7 +62,7 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
               </span>
             </div>
 
-            {/* CHANGED: Wrapped Input and Icon in a relative div for perfect centering */}
+            {/* Relative wrapper for perfect icon centering */}
             <div className="relative">
               <Input
                 id="password"
@@ -84,7 +78,11 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <EyeOff className="w-4 h-4 md:w-5 md:h-5" /> : <Eye className="w-4 h-4 md:w-5 md:h-5" />}
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4 md:w-5 md:h-5" />
+                ) : (
+                  <Eye className="w-4 h-4 md:w-5 md:h-5" />
+                )}
               </div>
             </div>
           </div>
@@ -101,7 +99,7 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
         </div>
       </form>
 
-      {/* Footer / Register Link */}
+      {/* Footer */}
       <div className="text-muted-foreground text-center text-xs md:text-sm mt-2">
         <p>
           Don&apos;t have an account?{" "}
@@ -114,5 +112,5 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
         </p>
       </div>
     </div>
-  )
+  );
 }
