@@ -1,3 +1,4 @@
+import React from "react";
 import {
   RocketIcon,
   Sparkles,
@@ -21,13 +22,13 @@ function Hero() {
   }
 
   return (
-    // CHANGED: Removed fixed mx-40. Used px-4 for mobile spacing and flex-center for alignment.
-    <section className="min-h-screen flex items-center justify-center px-4 py-12 transition-colors duration-300">
+    // FIX 1: Added 'w-full' so the section spans the entire screen width.
+    // 'flex items-center justify-center' centers the card vertically and horizontally.
+    <section className="min-h-screen w-full flex items-center justify-center px-4 py-12 transition-colors duration-300">
       
-      {/* CHANGED: Ensure card takes full width available but stops at max-w-6xl */}
-      <Card className="w-full max-w-6xl border rounded-3xl shadow-2xl bg-white dark:bg-zinc-900 dark:border-zinc-800 transition-colors duration-300">
+      {/* FIX 2: Added 'mx-auto' to force the card to center itself if flexbox behaves oddly */}
+      <Card className="w-full max-w-6xl mx-auto border rounded-3xl shadow-2xl bg-white dark:bg-zinc-900 dark:border-zinc-800 transition-colors duration-300">
         
-        {/* CHANGED: Adjusted padding to be smaller on mobile (p-6) and larger on desktop (md:p-14) */}
         <CardContent className="p-6 sm:p-10 md:p-14 space-y-10">
           
           {/* Header Section */}
@@ -55,7 +56,7 @@ function Hero() {
           </div>
 
           {/* Features Flow Section */}
-          {/* CHANGED: Uses flex-col for mobile (stack vertical) and md:flex-row for desktop (horizontal) */}
+          {/* Mobile: Stack vertically (flex-col). Desktop: Row (md:flex-row) */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-gray-700 dark:text-gray-300 text-sm sm:text-base font-medium">
             
             <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-800/50 px-4 py-2 rounded-full border dark:border-zinc-700">
@@ -63,7 +64,7 @@ function Hero() {
               Post Questions
             </div>
 
-            {/* CHANGED: Arrow rotates 90deg on mobile to point down, 0deg on desktop to point right */}
+            {/* Arrow rotates: Down on mobile (90deg), Right on desktop (0deg) */}
             <ArrowRight className="w-5 h-5 text-gray-400 rotate-90 md:rotate-0" />
 
             <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-800/50 px-4 py-2 rounded-full border dark:border-zinc-700">
