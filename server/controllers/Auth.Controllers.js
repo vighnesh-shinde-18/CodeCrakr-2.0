@@ -128,7 +128,8 @@ const logoutUser = asyncHandler(async (req,res)=>{
   res.clearCookie('AccessToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: 'strict',
+    path: '/'
   });
 
   res.status(200).json({ success: true, message: 'Logged out successfully' });
