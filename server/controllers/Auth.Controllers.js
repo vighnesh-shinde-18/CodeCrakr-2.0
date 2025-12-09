@@ -3,6 +3,13 @@ import asyncHandler from "../utils/asyncHandler.js"
 import User from "../models/User.Model.js";
 import sendOtp from "../utils/sendOtp.js";
 
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // true in production, false in local
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for cross-site in prod
+    path: '/' // <--- CRITICAL: Makes cookie visible to all pages
+};
+
 const registerUser = asyncHandler(async (req, res) => {
 
     const { username, password, email } = req.body;
@@ -19,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
         $or: [{ email }, { username }]
     })
 
-    if (!existingUser) {
+    if (existingUser) {
         throw new ApiError(409, "User Already Exist")
     }
 
@@ -71,15 +78,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const loggedInUser = await User.findById(user._id).select("-password -resetPasswordOTP -_id -createdAt -updatedAt -__v -isAdmin")
 
-    const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
-    }
-
+  
     return res
         .status(200)
-        .cookie("AccessToken", accessToken, options)
+        .cookie("AccessToken", accessToken, cookieOptions)
         .json({ success: true, data: { user: loggedInUser }, message: "User LoggedIn Successfully" })
 
 
@@ -125,12 +127,7 @@ const validateAndResetPassword = asyncHandler(async (req, res) => {
 
 const logoutUser = asyncHandler(async (req,res)=>{
    
-  res.clearCookie('AccessToken', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/'
-  });
+  res.clearCookie('AccessToken', cookieOptions);
 
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 
