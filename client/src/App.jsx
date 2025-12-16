@@ -31,9 +31,10 @@ function App() {
         <Route path='/problems' element={<Layout><ProblemList /></Layout>} />
         <Route path='/problem-manager' element={<Layout><ProblemManager /></Layout>} />
         <Route path='/history' element={<Layout><History /></Layout>} />
-            <Route path='/code-playground' element={<Layout><CodePlayGround /></Layout>} />
-            <Route path='/ai/:feature' element={<Layout><AIFeature /></Layout>} />
-            <Route path="/solve-problem/:slug/:id" element={<Layout sidebarVisible={false}><ProblemSolving /></Layout>} />
+        <Route path='/code-playground' element={<Layout><CodePlayGround /></Layout>} />
+        <Route path='/ai/:feature' element={<Layout><AIFeature /></Layout>} />
+        <Route path="/solve-problem/:slug/:id" element={<Layout sidebarVisible={false}><ProblemSolving /></Layout>} />
+      </Routes>
       <Toaster richColors position='top-right' />
       <ThemeToggleButton />
     </>
