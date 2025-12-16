@@ -1,4 +1,3 @@
-
 import {
   RocketIcon,
   Sparkles,
@@ -13,10 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom"
  
-
 function Hero() {
   const gitHubUrl = "https://github.com/vighnesh-shinde-18/CodeCrackr";
-
   const navigate = useNavigate()
 
   function handleStart() {
@@ -24,43 +21,48 @@ function Hero() {
   }
 
   return (
-    <section className="min-h-screen flex items-center justify-center mx-40 px-4 py-12 transition-colors duration-300">
+    // FIX 1: Removed 'mx-40'. Used 'w-full' and responsive padding (p-4 for mobile, p-12 for desktop)
+    <section className="min-h-screen flex items-center justify-center w-full p-4 md:p-12 transition-colors duration-300">
+      
       <Card className="w-full max-w-6xl border rounded-3xl shadow-2xl bg-white dark:bg-zinc-900 dark:border-zinc-800 transition-colors duration-300">
         <CardContent className="p-6 sm:p-10 md:p-14 space-y-10">
+          
           <div className="text-center space-y-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-primary dark:text-white flex justify-center gap-2">
+            {/* FIX 2: Added 'flex-col md:flex-row' to handle icon stacking on very small screens */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-primary dark:text-white flex flex-col md:flex-row items-center justify-center gap-2">
               <Sparkles className="w-7 h-7 text-purple-700 animate-bounce" />
-              CodeCrackr — DSA Q&A Platform with AI
+              <span className="text-center">CodeCrackr — DSA Q&A Platform with AI</span>
             </h1>
+            
             <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
               A Stack Overflow-inspired platform for DSA questions. Ask, answer, and get AI help to debug, explain, or improve your solutions.
             </p>
+            
             <div className="flex justify-center pt-2">
-              <Button size="lg" onClick={handleStart} className="gap-2 cursor-pointer">
-                <RocketIcon className="w-5 h-5 " />
+              <Button size="lg" onClick={handleStart} className="gap-2 cursor-pointer w-full sm:w-auto">
+                <RocketIcon className="w-5 h-5" />
                 Get Started
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-gray-700 dark:text-gray-300 text-sm sm:text-base font-medium">
+
+          {/* FIX 3: Improved flex wrapping for the feature list on mobile */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-gray-700 dark:text-gray-300 text-sm sm:text-base font-medium text-center">
             <div className="flex items-center gap-2">
-              <PencilLine className="w-5 h-5 text-purple-700" />
-              Post DSA Questions
+              <PencilLine className="w-5 h-5 text-purple-700 shrink-0" />
+              Post Questions
             </div>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 hidden sm:block text-gray-400" />
+            
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-green-600" />
+              <MessageSquare className="w-5 h-5 text-green-600 shrink-0" />
               Submit Solutions
             </div>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 hidden sm:block text-gray-400" />
+            
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              Mark Answers as Accepted
-            </div>
-            <ArrowRight className="w-4 h-4" />
-            <div className="flex items-center gap-2">
-              <Brain className="w-5 h-5 text-blue-600" />
-              Get AI Help (Debug / Explain / Optimize)
+              <Brain className="w-5 h-5 text-blue-600 shrink-0" />
+              Get AI Help
             </div>
           </div>
 
@@ -72,9 +74,10 @@ function Hero() {
               className="hover:underline flex justify-center items-center gap-1 cursor-pointer"
             >
               <Github className="w-4 h-4" />
-              View Full Source Code on GitHub
+              View Source Code
             </a>
           </div>
+
         </CardContent>
       </Card>
     </section>
