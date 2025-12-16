@@ -1,5 +1,7 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
+
+import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoute.jsx' // Import the new component
 import Hero from './Pages/Hero.jsx'
 import ThemeToggleButton from './components/ThemeButton/ThemeToggleButton.jsx'
 import LogIn from './Pages/LogIn.jsx'
@@ -17,24 +19,25 @@ import ProblemSolving from './Pages/ProblemSolving.jsx'
 
 import { Toaster } from 'sonner'
 
-
 function App() {
 
   return (
     <>
-      <Routes>
+      <Routes> 
         <Route path='/' element={<Hero />} />
         <Route path='/login' element={<LogIn />} />
         <Route path='/register' element={<Register />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password' element={<ResetPassword />} />
-        <Route path='/dashboard' element={<Layout><Dashboard /></Layout>} />
-        <Route path='/problems' element={<Layout><ProblemList /></Layout>} />
-        <Route path='/problem-manager' element={<Layout><ProblemManager /></Layout>} />
-        <Route path='/history' element={<Layout><History /></Layout>} />
-        <Route path='/code-playground' element={<Layout><CodePlayGround /></Layout>} />
-        <Route path='/ai/:feature' element={<Layout><AIFeature /></Layout>} />
-        <Route path="/solve-problem/:slug/:id" element={<Layout sidebarVisible={false}><ProblemSolving /></Layout>} />
+        <Route element={<ProtectedRoute />}>
+            <Route path='/dashboard' element={<Layout><Dashboard /></Layout>} />
+            <Route path='/problems' element={<Layout><ProblemList /></Layout>} />
+            <Route path='/problem-manager' element={<Layout><ProblemManager /></Layout>} />
+            <Route path='/history' element={<Layout><History /></Layout>} />
+            <Route path='/code-playground' element={<Layout><CodePlayGround /></Layout>} />
+            <Route path='/ai/:feature' element={<Layout><AIFeature /></Layout>} />
+            <Route path="/solve-problem/:slug/:id" element={<Layout sidebarVisible={false}><ProblemSolving /></Layout>} />
+        </Route>
       </Routes>
 
       <Toaster richColors position='top-right' />
