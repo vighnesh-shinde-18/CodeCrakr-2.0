@@ -22,7 +22,7 @@ import {
 
 // Import the services
 import historyService from "../../api/HistoryServices.jsx";
-import aiInteractionService from "../../api/AiInteractionsService.jsx";
+import aiInteractionService from "../../api/AiInteractionsServices.jsx";
 import AiResponseViewer from "../AiResponse/AiResponseViewer.jsx";
 
 export function HistoryAiFeatures() {
