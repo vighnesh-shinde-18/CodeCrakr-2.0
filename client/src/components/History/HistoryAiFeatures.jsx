@@ -20,8 +20,9 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-// Import the service
+// Import the services
 import historyService from "../../api/HistoryServices.jsx"; 
+import aiInteractionService from "../../api/AiInteractionService.jsx";
 import AiResponseViewer from "../AiResponse/AiResponseViewer.jsx";
 
 export function HistoryAiFeatures() {
@@ -30,6 +31,7 @@ export function HistoryAiFeatures() {
   const [viewDialog, setViewDialog] = useState(false);
   const [selectedInteraction, setSelectedInteraction] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(null); // Track which item is being deleted
 
   // 1. Mapping Backend "FeatureType" strings to UI Display names
   const featureMap = useMemo(() => ({
@@ -88,19 +90,54 @@ export function HistoryAiFeatures() {
     setViewDialog(true);
   };
 
-  const handleDelete = (id) => {
-    setHistory((prev) => prev.filter((item) => item._id !== id));
-    toast.success("Interaction deleted successfully");
+  // Delete single interaction
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this interaction?")) return;
+    
+    setDeleteLoading(id);
+    try {
+      await aiInteractionService.deleteInteractionById(id);
+      setHistory((prev) => prev.filter((item) => item._id !== id));
+      toast.success("Interaction deleted successfully");
+      
+      // Close dialog if the deleted item was being viewed
+      if (selectedInteraction?._id === id) {
+        setViewDialog(false);
+        setSelectedInteraction(null);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to delete interaction");
+    } finally {
+      setDeleteLoading(null);
+    }
   };
 
-  const handleDeleteAll = () => {
-    if(!confirm("Are you sure you want to delete all history?")) return;
-    setHistory([]);
-    toast.success("All history cleared");
+  // Delete all interactions
+  const handleDeleteAll = async () => {
+    if (!confirm("Are you sure you want to delete all history?")) return;
+    
+    setLoading(true);
+    try {
+      await aiInteractionService.deleteAllInteractions();
+      setHistory([]);
+      toast.success("All history cleared successfully");
+      
+      // Close dialog if open
+      if (viewDialog) {
+        setViewDialog(false);
+        setSelectedInteraction(null);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to delete all interactions");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const availableFeatures = useMemo(() => {
-     return ["GeneratCode", "ConvertCode", "ExplainCode", "DebugCode", "ReviewCode","GenerateTestCases"];
+     return ["GenerateCode", "ConvertCode", "ExplainCode", "DebugCode", "ReviewCode","GenerateTestCases"];
   }, []);
 
   return (
@@ -123,7 +160,20 @@ export function HistoryAiFeatures() {
             </SelectContent>
           </Select>
 
-          <Button variant="destructive" onClick={handleDeleteAll}>Delete All</Button>
+          <Button 
+            variant="destructive" 
+            onClick={handleDeleteAll}
+            disabled={loading || history.length === 0}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              "Delete All"
+            )}
+          </Button>
         </div>
       </div>
 
@@ -163,14 +213,26 @@ export function HistoryAiFeatures() {
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="w-4 h-4" />
+                      <Button 
+                        size="icon" 
+                        variant="ghost"
+                        disabled={deleteLoading === f._id}
+                      >
+                        {deleteLoading === f._id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <MoreHorizontal className="w-4 h-4" />
+                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => handleView(f)}>View Details</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDelete(f._id)} className="text-red-600 focus:text-red-600">
-                        Delete
+                      <DropdownMenuItem 
+                        onClick={() => handleDelete(f._id)} 
+                        className="text-red-600 focus:text-red-600"
+                        disabled={deleteLoading === f._id}
+                      >
+                        {deleteLoading === f._id ? "Deleting..." : "Delete"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -214,10 +276,6 @@ export function HistoryAiFeatures() {
             
             <div className="space-y-2">
                 <strong className="block text-base">AI Response:</strong>
-                {/* Correction here:
-                   1. response: passed selectedInteraction.response (the actual data), not selectedInteraction (the wrapper)
-                   2. featureType: mapped the Display name (e.g. "Debug") to lowercase ("debug") to match AiResponseViewer
-                */}
                 <div className="border rounded-md p-4 bg-slate-50 dark:bg-slate-900">
                     <AiResponseViewer 
                         isHistory={true} 
