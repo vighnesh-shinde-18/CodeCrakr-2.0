@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // Import the services
-import historyService from ".././api/HistoryServices.jsx"; 
-import aiInteractionService from ".././api/AiInteractionService.jsx";
+import historyService from "../../api/HistoryServices.jsx";
+import aiInteractionService from "../../api/AiInteractionService.jsx";
 import AiResponseViewer from "../AiResponse/AiResponseViewer.jsx";
 
 export function HistoryAiFeatures() {
