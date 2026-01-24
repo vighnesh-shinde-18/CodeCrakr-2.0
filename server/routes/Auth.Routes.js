@@ -1,7 +1,7 @@
 import express from 'express'
 import { registerUser, loginUser, generateAndSendOtp, validateAndResetPassword, logoutUser } from '../controllers/Auth.Controller.js'
 import { verifyJwt } from '../middlewares/Auth.Middleware.js'
-import { validate } from "../middlewares/validate.middleware.js";
+import { validate } from "../middlewares/Validate.Middleware.js";
 import {
     registerSchema,
     loginSchema,
