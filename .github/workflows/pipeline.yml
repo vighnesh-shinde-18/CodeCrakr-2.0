@@ -10,6 +10,10 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./server
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -19,6 +23,7 @@ jobs:
       with:
         node-version: '20'
         cache: 'npm'
+        cache-dependency-path: ./server/package-lock.json
 
     - name: Install Dependencies
       # Installs deps to ensure package.json is valid
